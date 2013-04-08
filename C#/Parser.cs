@@ -143,9 +143,9 @@ namespace ExprCS
 
             currToken = TokenType.T_EOL;
 
+            currToken = m_Lexer.m_currToken.Type;
             if (m_Lexer.m_currToken.Type == TokenType.T_UMINUS)
             {
-                currToken = m_Lexer.m_currToken.Type;
                 m_Lexer.GetNextToken();
             }
 
