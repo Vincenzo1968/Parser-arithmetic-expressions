@@ -146,9 +146,9 @@ public class CParser
 		double dblValue;
 		currToken = CLexer.TokenTypeEnum.T_EOL;
 
+		currToken = m_Lexer.m_currToken.Type;
 		if ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_UMINUS )
 		{
-			currToken = m_Lexer.m_currToken.Type;
 			m_Lexer.GetNextToken();
 		}
 
