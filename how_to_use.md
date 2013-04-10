@@ -3,11 +3,11 @@ Once you have compiled the program can be used by typing ther name on the comman
 For example, if you have compiled assigning the name exprparser (or exprparser.exe on Windows)
 you can simply run it as:
 
-Linux:
+*Linux*:
 
     ./exprparser
     
-Windows:
+*Windows*:
 
     exprparser
     
@@ -25,18 +25,21 @@ pressing enter you will be shown the result:
 It shows again the prompt that asks you to enter a new expression.
 If you want to exit the program simply type ENTER without entering anything.
 
--------------------------------------------------------------------------------------------------
+
+
+
+
 
 Una volta compilato il programma può essere usato digitando il nome sulla riga di comando.
 
 Per esempio, se l'avete compilato assegnandogli il nome exprparser(o exprparser.exe su Windows),
 potete eseguirlo semplicemente come:
 
-Linux:
+*Linux*:
 
     ./exprparser
     
-Windows:
+*Windows*:
 
     exprparser
     

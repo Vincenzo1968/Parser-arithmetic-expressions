@@ -2,6 +2,7 @@ Parser-arithmetic-expressions
 =============================
 
 Arithmetic expressions recursive descent parser
+-----------------------------------------------
 
 The parser uses the following EBNF grammar:
 
@@ -13,9 +14,9 @@ The parser uses the following EBNF grammar:
 
 The non-terminal symbols of the grammar are:
 
-expr expr1 expr2 expr3 expr4
+    expr expr1 expr2 expr3 expr4
 
-expr is the initial symbol.
+*expr* is the initial symbol.
 
 The terminal symbols are:
 
@@ -24,7 +25,7 @@ The terminal symbols are:
 The braces are used to indicate zero or more occurrences.
 The square brackets are used to indicate zero or one occurrence.
 Parentheses are used to indicate the groupings.
-The vertical bar, |, indicates a choice between two options.
+The vertical bar, *|*, indicates a choice between two options.
 
 For example, the first rule of the grammar
 
@@ -43,6 +44,7 @@ symbol does not match, it returns an error message.
 
 An example, in C-like pseudocode, related to the first grammar rule:
 
+```c
     /* expr  : expr1 {('+' | '-') expr1}; */
     int expr()
     {
@@ -59,8 +61,9 @@ An example, in C-like pseudocode, related to the first grammar rule:
         
         return 1;
     }
+```
 
------------------------------------------------------------------------------------------------
+
 
 Il parser usa la seguente grammatica EBNF:
    
@@ -74,9 +77,9 @@ Il parser usa la seguente grammatica EBNF:
 	
 I simboli non terminali della grammatica sono:
 
-expr expr1 expr2 expr3 expr4
+    expr expr1 expr2 expr3 expr4
 
-expr è il simbolo iniziale.
+*expr* è il simbolo iniziale.
 
 I simboli terminali sono:
 
@@ -86,14 +89,14 @@ I simboli terminali sono:
 Le parentesi graffe sono usate per indicare zero o più occorrenze.
 Le parentesi quadre sono usate per indicare zero o una occorrenza.
 Le parentesi tonde sono usate per indicare i raggruppamenti.
-La barra verticale, |, indica una scelta tra due opzioni.
+La barra verticale, *|*, indica una scelta tra due opzioni.
 
 Per esempio, la prima regola della grammatica
 
     expr  : expr1 {('+' | '-') expr1};
 
 ci dice che: 
-expr è un'espressione formata da expr1 seguita da zero o più
+expr è un'espressione formata da expr1 seguita da: zero o più
 ripetizioni del simbolo '+' o del simbolo '-' seguito da expr1.
 
 L'algoritmo a discesa ricorsiva consiste nell'implementare una
@@ -106,6 +109,7 @@ simbolo non corrisponde, si riporta un messaggio d'errore.
 
 Un esempio, in pseudocode simil-C, relativo alla prima regola grammaticale:
 
+```c
     /* expr  : expr1 {('+' | '-') expr1}; */
     int expr()
     {
@@ -122,3 +126,4 @@ Un esempio, in pseudocode simil-C, relativo alla prima regola grammaticale:
         
         return 1;
     }
+```
