@@ -5,25 +5,24 @@ Arithmetic expressions recursive descent parser
 
 The parser uses the following EBNF grammar:
 
-    expr  : expr1 {('+' | '-') expr1};
+    expr : expr1 {('+' | '-') expr1};
     expr1 : expr2 {('*' | '/') expr2};
     expr2 : ['-'] expr3;
-    expr3 : T_NUMBER | '(' expr ')';
+    expr3 : expr4 {'^' expr4}
+    expr4 : T_NUMBER | '(' expr ')'    
 
 The non-terminal symbols of the grammar are:
 
-expr expr1 expr2 expr3
+expr expr1 expr2 expr3 expr4
 
 expr is the initial symbol.
 
 The terminal symbols are:
 
-    '+', '-', '*', '/', '(', ')', 'T_NUMBER'
+    '+', '-', '*', '/', '^', '(', ')', 'T_NUMBER'
 
-The braces are used to indicate zero
-or more occurrences.
-The square brackets are used to indicate zero
-or one occurrence.
+The braces are used to indicate zero or more occurrences.
+The square brackets are used to indicate zero or one occurrence.
 Parentheses are used to indicate the groupings.
 The vertical bar, |, indicates a choice between two options.
 
@@ -64,28 +63,28 @@ An example, in C-like pseudocode, related to the first grammar rule:
 -----------------------------------------------------------------------------------------------
 
 Il parser usa la seguente grammatica EBNF:
-
-    expr  : expr1 {('+' | '-') expr1};
+   
+    expr : expr1 {('+' | '-') expr1};
     expr1 : expr2 {('*' | '/') expr2};
     expr2 : ['-'] expr3;
-    expr3 : T_NUMBER | '(' expr ')';
+    expr3 : expr4 {'^' expr4}
+    expr4 : T_NUMBER | '(' expr ')'    
+    
 
 	
 I simboli non terminali della grammatica sono:
 
-expr expr1 expr2 expr3
+expr expr1 expr2 expr3 expr4
 
 expr è il simbolo iniziale.
 
 I simboli terminali sono:
 
-    '+', '-', '*', '/', '(', ')', 'T_NUMBER'
+    '+', '-', '*', '/', '^', '(', ')', 'T_NUMBER'
 
 
-Le parentesi graffe sono usate per indicare zero
-o più occorrenze.
-Le parentesi quadre sono usate per indicare zero
-o una occorrenza.
+Le parentesi graffe sono usate per indicare zero o più occorrenze.
+Le parentesi quadre sono usate per indicare zero o una occorrenza.
 Le parentesi tonde sono usate per indicare i raggruppamenti.
 La barra verticale, |, indica una scelta tra due opzioni.
 
