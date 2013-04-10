@@ -23,6 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+// gcc -Wall -W -O3 -std=c99 ParseExpr.c parser.c lexer.c -lm -o expr
 
 #include "parser.h"
 
@@ -30,7 +33,8 @@
 expr  : expr1 {('+' | '-') expr1};
 expr1 : expr2 {('*' | '/') expr2};
 expr2 : ['-'] expr3;
-expr3 : T_NUMBER
+expr3 : expr4 {'^' expr4}
+expr4 : T_NUMBER
 		| '(' expr ')'
 */
 
@@ -170,9 +174,42 @@ int expr2(ParserData *pd)
 	return 1;
 }
 
-//expr3 : T_NUMBER
-//		| '(' expr ')'
+//expr3 : expr4 {'^' expr4}
 int expr3(ParserData *pd)
+{
+	double right, left;
+	//int currToken;
+	int count = 0;
+
+	if ( !expr4(pd) )
+		return 0;
+
+	while ( pd->m_Token.Type == T_EXP )
+	{
+		count++;
+		
+		//currToken = pd->m_Token.Type;
+		GetNextToken(pd->m_strExpr, &(pd->m_Token));
+
+		if ( !expr4(pd) )
+			return 0;
+	}
+	
+	while ( count )
+	{
+		right = pd->m_stack[pd->m_top--];
+		left  = pd->m_stack[pd->m_top--];
+		
+		pd->m_stack[++pd->m_top] = pow(left, right);
+		
+		count--;
+	}	
+
+	return 1;
+}
+
+//expr4 : T_NUMBER | '(' expr ')'
+int expr4(ParserData *pd)
 {
 	switch( pd->m_Token.Type )
 	{

@@ -27,7 +27,8 @@ import java.lang.StringBuilder;
 expr  : expr1 {('+' | '-') expr1};
 expr1 : expr2 {('*' | '/') expr2};
 expr2 : ['-'] expr3;
-expr3 : T_NUMBER | '(' expr ')'
+expr3 : expr4 {'^' expr4}
+expr4 : T_NUMBER | '(' expr ')'
 */
 
 public class CParser
@@ -145,9 +146,9 @@ public class CParser
 		double dblValue;
 		currToken = CLexer.TokenTypeEnum.T_EOL;
 
-		currToken = m_Lexer.m_currToken.Type;
 		if ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_UMINUS )
 		{
+			currToken = m_Lexer.m_currToken.Type;
 			m_Lexer.GetNextToken();
 		}
 
@@ -164,9 +165,42 @@ public class CParser
 		return true;	
 	}
 	
-	//expr3 : T_NUMBER
-	//		| '(' expr ')'
+	//expr3 : expr4 {'^' expr4}
 	private boolean expr3()
+	{
+		double right, left;
+		int count = 0;
+		//CLexer.TokenTypeEnum currToken;
+
+		if ( !expr4() )
+			return false;
+
+		while ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_EXP )
+		{
+			count++;
+			//currToken = m_Lexer.m_currToken.Type;
+			m_Lexer.GetNextToken();
+
+			if ( !expr4() )
+				return false;
+		}
+		
+		while ( count > 0 )
+		{
+			right = m_stack[m_top--];
+			left  = m_stack[m_top--];
+
+			m_stack[++m_top] = Math.pow(left, right);
+			
+			count--;
+		}
+
+		return true;	
+	}
+		
+	//expr4 : T_NUMBER
+	//		| '(' expr ')'
+	private boolean expr4()
 	{	
 		switch( m_Lexer.m_currToken.Type )
 		{

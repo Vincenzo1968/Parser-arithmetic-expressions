@@ -22,16 +22,21 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
+
 using namespace std;
 
 #include "parser.h"
+
+// g++ -Wall -W -O3 -std=c++11 ParseExpr.cpp parser.cpp lexer.cpp -lm -o expr
 
 /*
 expr  : expr1 {('+' | '-') expr1};
 expr1 : expr2 {('*' | '/') expr2};
 expr2 : ['-'] expr3;
-expr3 : T_NUMBER
-		| '(' expr ')'
+expr3 : expr4 {'^' expr4};
+expr4 : T_NUMBER
+		| '(' expr ')';
 */
 
 bool CParser::Parse(const char *strExpr)
@@ -156,9 +161,43 @@ bool CParser::expr2()
 	return true;
 }
 
-//expr3 : T_NUMBER
-//		| '(' expr ')'
+//expr3 : expr4 {'^' expr4};
 bool CParser::expr3()
+{
+	double right, left;
+	//int currToken;
+	int count = 0;
+
+	if ( !expr4() )
+		return false;
+
+	while ( m_Lexer.m_currToken.Type == T_EXP )
+	{
+		count++;
+		
+		//currToken = m_Lexer.m_currToken.Type;
+		m_Lexer.GetNextToken();
+
+		if ( !expr4() )
+			return false;
+	}
+	
+	while ( count )
+	{
+		right = m_stack[m_top--];
+		left  = m_stack[m_top--];
+		
+		m_stack[++m_top] = pow(left, right);
+		
+		count--;
+	}
+
+	return true;
+}
+
+//expr4 : T_NUMBER
+//		| '(' expr ')'
+bool CParser::expr4()
 {
 	switch( m_Lexer.m_currToken.Type )
 	{

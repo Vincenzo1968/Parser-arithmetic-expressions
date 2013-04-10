@@ -142,6 +142,14 @@ TokenTypeEnum CLexer::GetNextToken()
 			++m_nNextPos;
 			return T_DIV;
 		}
+		else if ( m_strExpr[m_nNextPos] == '^' )
+		{
+			m_PreviousTokenType = m_currToken.Type;
+			m_currToken.Type = T_EXP;
+			strcpy(m_currToken.str, "^");
+			++m_nNextPos;
+			return T_EXP;
+		}		
 		else
 		{
 			m_PreviousTokenType = m_currToken.Type;

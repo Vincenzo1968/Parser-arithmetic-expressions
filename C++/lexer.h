@@ -32,6 +32,7 @@ typedef enum tagTokenType
 	T_NUMBER,
 	T_OPAREN,
 	T_CPAREN,
+	T_EXP,	
 	T_UMINUS,
 	T_MULT,
 	T_DIV,

@@ -36,7 +36,8 @@ public class CLexer
 		T_MULT,
 		T_DIV,
 		T_PLUS,
-		T_MINUS
+		T_MINUS,
+		T_EXP		
 	}
 
 	static public class Token
@@ -192,6 +193,14 @@ public class CLexer
 				++m_nNextPos;
 				return TokenTypeEnum.T_DIV;
 			}
+			else if ( m_nNextPos < str.length() && str.charAt(m_nNextPos) == '^' )
+			{
+				m_PreviousTokenType = m_currToken.Type;
+				m_currToken.Type = TokenTypeEnum.T_EXP;
+				m_currToken.str = new String("^");
+				++m_nNextPos;
+				return TokenTypeEnum.T_EXP;
+			}			
 			else
 			{
 				m_PreviousTokenType = m_currToken.Type;

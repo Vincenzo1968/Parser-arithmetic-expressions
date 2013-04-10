@@ -164,7 +164,6 @@ TokenTypeEnum GetNextToken(const char *str, Token *token)
 			token->PreviousTokenType = T_DIV;
 			return T_DIV;
 		}
-		/*
 		else if ( str[token->nNextPos] == '^' )
 		{
 			token->Type = T_EXP;
@@ -173,7 +172,6 @@ TokenTypeEnum GetNextToken(const char *str, Token *token)
 			token->PreviousTokenType = T_EXP;
 			return T_EXP;
 		}
-		*/
 		else
 		{
 			token->Type = T_UNKNOWN;

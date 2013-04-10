@@ -48,6 +48,7 @@ private:
 	bool expr1();
 	bool expr2();
 	bool expr3();
+	bool expr4();
 
 	bool match(TokenTypeEnum ExpectedToken)
 	{

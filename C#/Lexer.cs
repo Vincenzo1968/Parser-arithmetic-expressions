@@ -41,7 +41,8 @@ namespace ExprCS
         T_MULT,
         T_DIV,
         T_PLUS,
-        T_MINUS
+        T_MINUS,
+        T_EXP        
     }
 
     public struct Token
@@ -204,6 +205,14 @@ namespace ExprCS
                     ++m_nNextPos;
                     return TokenType.T_DIV;
                 }
+                else if (m_nNextPos < m_strExpr.Length && strExpr[m_nNextPos] == '^')
+                {
+                    m_PreviousTokenType = m_currToken.Type;
+                    m_currToken.Type = TokenType.T_EXP;
+                    m_currToken.str = "^";
+                    ++m_nNextPos;
+                    return TokenType.T_EXP;
+                }                
                 else
                 {
                     m_PreviousTokenType = m_currToken.Type;

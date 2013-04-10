@@ -45,5 +45,6 @@ int expr(ParserData *pd);
 int expr1(ParserData *pd);
 int expr2(ParserData *pd);
 int expr3(ParserData *pd);
+int expr4(ParserData *pd);
 
 #endif // PARSER_H

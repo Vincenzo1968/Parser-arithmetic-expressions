@@ -135,6 +135,7 @@ namespace ExprCS
 
             return true;
         }
+                
         private bool expr2()
         {
             TokenType currToken;
@@ -142,9 +143,9 @@ namespace ExprCS
 
             currToken = TokenType.T_EOL;
 
-            currToken = m_Lexer.m_currToken.Type;
             if (m_Lexer.m_currToken.Type == TokenType.T_UMINUS)
             {
+                currToken = m_Lexer.m_currToken.Type;
                 m_Lexer.GetNextToken();
             }
 
@@ -160,7 +161,40 @@ namespace ExprCS
 
             return true;
         }
+        
         private bool expr3()
+        {
+            double right, left;
+            //TokenType currToken;
+            int count = 0;
+
+            if (!expr4())
+                return false;
+
+            while (m_Lexer.m_currToken.Type == TokenType.T_EXP)
+            {
+				count++;
+                //currToken = m_Lexer.m_currToken.Type;
+                m_Lexer.GetNextToken();
+
+                if (!expr4())
+                    return false;
+            }
+            
+            while ( count )
+            {
+                right = m_stack[m_top--];
+                left = m_stack[m_top--];
+
+                m_stack[++m_top] = Math.Pow(left, right);
+                
+                count--;
+			}
+
+            return true;
+        }
+        
+        private bool expr4()
         {
             switch (m_Lexer.m_currToken.Type)
             {
