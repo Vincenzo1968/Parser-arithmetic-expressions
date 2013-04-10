@@ -29,7 +29,7 @@ The vertical bar, |, indicates a choice between two options.
 
 For example, the first rule of the grammar
 
-    expr: {expr1 ('+' | '-') expr1};
+    expr: expr1 {('+' | '-') expr1};
 
 tells us that:
 expr is an expression consisting of expr1 followed by zero or more
