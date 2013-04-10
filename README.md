@@ -5,22 +5,20 @@ Arithmetic expressions recursive descent parser
 
 The parser uses the following EBNF grammar:
 
-expr  : expr1 {('+' | '-') expr1};
-expr1 : expr2 {('*' | '/') expr2};
-expr2 : ['-'] expr3;
-expr3 : T_NUMBER
-		| '(' expr ')';
-
+    expr  : expr1 {('+' | '-') expr1};
+    expr1 : expr2 {('*' | '/') expr2};
+    expr2 : ['-'] expr3;
+    expr3 : T_NUMBER | '(' expr ')';
 
 The non-terminal symbols of the grammar are:
 
-expr expr2 expr1 expr3
+expr expr1 expr2 expr3
 
 expr is the initial symbol.
 
 The terminal symbols are:
 
-+ - * / () T_NUMBER
+    '+', '-', '*', '/', '(', ')', 'T_NUMBER'
 
 The braces are used to indicate zero
 or more occurrences.
@@ -31,7 +29,7 @@ The vertical bar, |, indicates a choice between two options.
 
 For example, the first rule of the grammar
 
-expr: {expr1 ('+' | '-') expr1};
+    expr: {expr1 ('+' | '-') expr1};
 
 tells us that:
 expr is an expression consisting of expr1 followed by zero or more
@@ -46,33 +44,33 @@ symbol does not match, it returns an error message.
 
 An example, in C-like pseudocode, related to the first grammar rule:
 
-/* expr  : expr1 {('+' | '-') expr1}; */
-int expr()
-{
-	if ( !expr1() )
-		return 0;
+    /* expr  : expr1 {('+' | '-') expr1}; */
+    int expr()
+    {
+        if ( !expr1() )
+            return 0;
 
-	while ( Token == T_PLUS || Token == T_MINUS )
-	{
-		GetNextToken();
+        while ( Token == T_PLUS || Token == T_MINUS )
+        {
+            GetNextToken();
 
-		if ( !expr1() )
-			return 0;
-	}
-
-	return 1;
-}
+            if ( !expr1() )
+                return 0;
+        }
+        
+        return 1;
+    }
 
 -----------------------------------------------------------------------------------------------
 
 Il parser usa la seguente grammatica EBNF:
 
-expr  : expr1 {('+' | '-') expr1};
-expr1 : expr2 {('*' | '/') expr2};
-expr2 : ['-'] expr3;
-expr3 : T_NUMBER
-		| '(' expr ')';
-		
+    expr  : expr1 {('+' | '-') expr1};
+    expr1 : expr2 {('*' | '/') expr2};
+    expr2 : ['-'] expr3;
+    expr3 : T_NUMBER | '(' expr ')';
+
+	
 I simboli non terminali della grammatica sono:
 
 expr expr1 expr2 expr3
@@ -81,7 +79,8 @@ expr è il simbolo iniziale.
 
 I simboli terminali sono:
 
-+ - * / ( ) T_NUMBER
+    '+', '-', '*', '/', '(', ')', 'T_NUMBER'
+
 
 Le parentesi graffe sono usate per indicare zero
 o più occorrenze.
@@ -92,7 +91,7 @@ La barra verticale, |, indica una scelta tra due opzioni.
 
 Per esempio, la prima regola della grammatica
 
-expr  : expr1 {('+' | '-') expr1};
+    expr  : expr1 {('+' | '-') expr1};
 
 ci dice che: 
 expr è un'espressione formata da expr1 seguita da zero o più
@@ -108,19 +107,19 @@ simbolo non corrisponde, si riporta un messaggio d'errore.
 
 Un esempio, in pseudocode simil-C, relativo alla prima regola grammaticale:
 
-/* expr  : expr1 {('+' | '-') expr1}; */
-int expr()
-{
-	if ( !expr1() )
-		return 0;
+    /* expr  : expr1 {('+' | '-') expr1}; */
+    int expr()
+    {
+        if ( !expr1() )
+            return 0;
 
-	while ( Token == T_PLUS || Token == T_MINUS )
-	{
-		GetNextToken();
+        while ( Token == T_PLUS || Token == T_MINUS )
+        {
+            GetNextToken();
 
-		if ( !expr1() )
-			return 0;
-	}
-
-	return 1;
-}
+            if ( !expr1() )
+                return 0;
+        }
+        
+        return 1;
+    }
