@@ -24,37 +24,44 @@ import java.lang.String;
 import java.lang.StringBuilder;
 
 /*
-<start> = <expr>
-<expr>  = <term> <exprp>
-<exprp> = + <term> <exprp> | - <term> <exprp> | epsilon
-<term>  = <fact> <termp>
-<termp> = * <fact> <termp> | / <fact> <termp> | epsilon
-<fact>  = - <factp> | <factp>
-<factp> = ( <expr> ) | NUM 
+<start>  = <expr>
+<expr>   = <term> <exprp>
+<exprp>  = + <term> <exprp> | - <term> <exprp> | epsilon
+<term>   = <fact> <termp>
+<termp>  = * <fact> <termp> | / <fact> <termp> | epsilon
+<fact>   = - <expon> | <expon>
+<expon>  = <factp> <exponp>
+<exponp> = ^ <factp> <exponp> | epsilon
+<factp>  = ( <expr> ) | NUM 
 */
 
 /*
 Nullable Set:
 exprp
 termp
+exponp
 
 First Set:
-FIRST(start) = { - NUM ( }
-FIRST(expr) = { - NUM ( }
-FIRST(exprp) = { - + empty }
-FIRST(term) = { - NUM ( }
-FIRST(termp) = { / * empty }
-FIRST(fact) = { - NUM ( }
-FIRST(factp) = { NUM ( }
+FIRST(start)  = { - NUM ( }
+FIRST(expr)   = { - NUM ( }
+FIRST(exprp)  = { - + empty }
+FIRST(term)   = { - NUM ( }
+FIRST(termp)  = { / * empty }
+FIRST(fact)   = { - NUM ( }
+FIRST(expon)  = { NUM ( }
+FIRST(exponp) = { ^ empty }
+FIRST(factp)  = { NUM ( }
 
 Follow Set:
-FOLLOW(start) = { $ }
-FOLLOW(expr) = { ) $ }
-FOLLOW(exprp) = { ) $ }
-FOLLOW(term) = { - + ) $ }
-FOLLOW(termp) = { - + ) $ }
-FOLLOW(fact) = { / * - + ) $ }
-FOLLOW(factp) = { / * - + ) $ }
+FOLLOW(start)  = { $ }
+FOLLOW(expr)   = { ) $ }
+FOLLOW(exprp)  = { ) $ }
+FOLLOW(term)   = { - + ) $ }
+FOLLOW(termp)  = { - + ) $ }
+FOLLOW(fact)   = { / * - + ) $ }
+FOLLOW(expon)  = { / * - + ) $ }
+FOLLOW(exponp) = { / * - + ) $ }
+FOLLOW(factp)  = { ^ / * - + ) $ }
 */
 
 public class CParser
@@ -214,7 +221,7 @@ public class CParser
 		return true;		
 	}
 	
-	//<fact>  = - <factp> | <factp>
+	//<fact>   = - <expon> | <expon>
 	private boolean fact()
 	{
 		boolean bUMinus = false;
@@ -225,7 +232,7 @@ public class CParser
 			m_Lexer.GetNextToken();
 		}
 			
-		if ( !factp() )
+		if ( !expon() )
 			return false;
 			
 		if ( bUMinus )
@@ -234,7 +241,62 @@ public class CParser
 		return true;
 	}	
 	
-	//<factp> = ( <expr> ) | NUM 
+	//<expon>  = <factp> <exponp>
+	private boolean expon()
+	{
+		if ( !factp() )
+			return false;
+			
+		if ( !exponp() )
+			return false;
+		
+		return true;
+	}
+	
+	//<exponp> = ^ <factp> <exponp> | epsilon
+	private boolean exponp()
+	{
+		double right, left;
+		
+		// FOLLOW(exponp) = { / * - + ) $ }
+			
+		switch ( m_Lexer.m_currToken.Type )
+		{
+			case T_EXP:	
+				m_Lexer.GetNextToken();
+				if ( !factp() )
+					return false;
+				//right = m_stack[m_top--];
+				//left  = m_stack[m_top--];
+				//m_stack[++m_top] = Math.pow(left, right);
+				if ( !exponp() )
+					return false;
+				// va messo qui perché l'operatore ^ è associativo a destra.
+				right = m_stack[m_top--];
+				left  = m_stack[m_top--];
+				m_stack[++m_top] = Math.pow(left, right);					
+				break;
+			case T_PLUS:   // epsilon
+				break;
+			case T_MINUS:  // epsilon
+				break;				
+			case T_MULT:   // epsilon
+				break;
+			case T_DIV:    // epsilon				
+				break;			
+			case T_CPAREN: // epsilon
+				break;			
+			case T_EOL:    // epsilon			
+				break;
+			default:
+				System.out.println("Errore di sintassi.");
+				return false;							
+		}
+		
+		return true;		
+	}	
+	
+	//<factp>  = ( <expr> ) | NUM 
 	private boolean factp()
 	{
 		switch( m_Lexer.m_currToken.Type )
@@ -260,7 +322,7 @@ public class CParser
 
 		return true;					
 	}
-	
+		
 	private boolean match(CLexer.TokenTypeEnum ExpectedToken)
 	{
 		if ( m_Lexer.m_currToken.Type == ExpectedToken )
