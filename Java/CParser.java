@@ -24,11 +24,44 @@ import java.lang.String;
 import java.lang.StringBuilder;
 
 /*
-expr  : expr1 {('+' | '-') expr1};
-expr1 : expr2 {('*' | '/') expr2};
-expr2 : ['-'] expr3;
-expr3 : expr4 {'^' expr4}
-expr4 : T_NUMBER | '(' expr ')'
+<start>  = <expr>
+<expr>   = <term> <exprp>
+<exprp>  = + <term> <exprp> | - <term> <exprp> | epsilon
+<term>   = <fact> <termp>
+<termp>  = * <fact> <termp> | / <fact> <termp> | epsilon
+<fact>   = - <expon> | <expon>
+<expon>  = <factp> <exponp>
+<exponp> = ^ <factp> <exponp> | epsilon
+<factp>  = ( <expr> ) | NUM 
+*/
+
+/*
+Nullable Set:
+exprp
+termp
+exponp
+
+First Set:
+FIRST(start)  = { - NUM ( }
+FIRST(expr)   = { - NUM ( }
+FIRST(exprp)  = { - + empty }
+FIRST(term)   = { - NUM ( }
+FIRST(termp)  = { / * empty }
+FIRST(fact)   = { - NUM ( }
+FIRST(expon)  = { NUM ( }
+FIRST(exponp) = { ^ empty }
+FIRST(factp)  = { NUM ( }
+
+Follow Set:
+FOLLOW(start)  = { $ }
+FOLLOW(expr)   = { ) $ }
+FOLLOW(exprp)  = { ) $ }
+FOLLOW(term)   = { - + ) $ }
+FOLLOW(termp)  = { - + ) $ }
+FOLLOW(fact)   = { / * - + ) $ }
+FOLLOW(expon)  = { / * - + ) $ }
+FOLLOW(exponp) = { / * - + ) $ }
+FOLLOW(factp)  = { ^ / * - + ) $ }
 */
 
 public class CParser
@@ -55,7 +88,7 @@ public class CParser
 
 		while ( ret && m_Lexer.m_currToken.Type != CLexer.TokenTypeEnum.T_EOL )
 		{
-			ret = expr();
+			ret = start();
 		}
 
 		if ( m_top >= 0 )
@@ -69,168 +102,227 @@ public class CParser
 	{
 		return m_value;
 	}
+	
 
-	//expr  : expr1 {('+' | '-') expr1};
+	//<start> = <expr>
+	private boolean start()
+	{
+		return expr();
+	}
+
+	//<expr> = <term> <exprp>	
 	private boolean expr()
 	{
-		double right, left;
-		CLexer.TokenTypeEnum currToken;
-
-		if ( !expr1() )
+		if ( !term() )
 			return false;
-
-		while ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_PLUS ||
-				m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_MINUS )
+			
+		if ( !exprp() )
+			return false;
+			
+		return true;
+	}
+	
+	//<exprp> = + <term> <exprp> | - <term> <exprp> | epsilon
+	private boolean exprp()
+	{
+		double right, left;
+			
+		switch ( m_Lexer.m_currToken.Type )
 		{
-			currToken = m_Lexer.m_currToken.Type;
-			m_Lexer.GetNextToken();
-
-			if ( !expr1() )
-				return false;
-
-			right = m_stack[m_top--];
-			left  = m_stack[m_top--];
-
-			if ( currToken == CLexer.TokenTypeEnum.T_PLUS )
+			case T_PLUS:	
+				m_Lexer.GetNextToken();
+				if ( !term() )
+					return false;
+				right = m_stack[m_top--];
+				left  = m_stack[m_top--];
 				m_stack[++m_top] = left + right;
-			else if ( currToken == CLexer.TokenTypeEnum.T_MINUS )
+				if ( !exprp() )
+					return false;
+				break;
+			case T_MINUS:
+				m_Lexer.GetNextToken();			
+				if ( !term() )
+					return false;
+				right = m_stack[m_top--];
+				left  = m_stack[m_top--];
 				m_stack[++m_top] = left - right;
-
+				if ( !exprp() )
+					return false;			
+				break;
+			case T_CPAREN: // epsilon
+				break;
+			case T_EOL:    // epsilon						
+				break;
+			default:
+				System.out.println("Errore di sintassi.");
+				return false;			
 		}
+		
+		return true;
+	}	
 
+	//<term> = <fact> <termp>
+	private boolean term()
+	{
+		if ( !fact() )
+			return false;
+			
+		if ( !termp() )
+			return false;
+			
+		return true;
+	}
+	
+	//<termp> = * <fact> <termp> | / <fact> <termp> | epsilon
+	private boolean termp()
+	{
+		double right, left;
+			
+		switch ( m_Lexer.m_currToken.Type )
+		{
+			case T_MULT:	
+				m_Lexer.GetNextToken();
+				if ( !fact() )
+					return false;
+				right = m_stack[m_top--];
+				left  = m_stack[m_top--];
+				m_stack[++m_top] = left * right;
+				if ( !termp() )
+					return false;
+				break;
+			case T_DIV:
+				m_Lexer.GetNextToken();			
+				if ( !fact() )
+					return false;
+				right = m_stack[m_top--];
+				if ( right == 0 )
+				{
+					System.out.println("Errore: divisione per zero.");
+					return false;					
+				}
+				left  = m_stack[m_top--];
+				m_stack[++m_top] = left / right;
+				if ( !termp() )
+					return false;			
+				break;
+			case T_PLUS:   // epsilon
+				break;
+			case T_MINUS:  // epsilon				
+				break;			
+			case T_CPAREN: // epsilon
+				break;			
+			case T_EOL:    // epsilon			
+				break;
+			default:
+				System.out.println("Errore di sintassi.");
+				return false;							
+		}
+		
 		return true;		
 	}
 	
-	//expr1 : expr2 {('*' | '/') expr2};
-	private boolean expr1()
+	//<fact>   = - <expon> | <expon>
+	private boolean fact()
 	{
-		double right, left;
-		CLexer.TokenTypeEnum currToken;
-
-		if ( !expr2() )
-			return false;
-
-		while ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_MULT ||
-				m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_DIV )
-		{
-			currToken = m_Lexer.m_currToken.Type;
-			m_Lexer.GetNextToken();
-
-			if ( !expr2() )
-				return false;
-
-			right = m_stack[m_top--];
-			left  = m_stack[m_top--];
-
-			if ( currToken == CLexer.TokenTypeEnum.T_MULT )
-				m_stack[++m_top] = left * right;
-			else if ( currToken == CLexer.TokenTypeEnum.T_DIV )
-			{
-				if ( right == 0 )
-				{
-					//System.out.println("Errore: divisione per zero.");
-					System.out.println("Error: division by zero.");					
-					return false;
-				}
-				m_stack[++m_top] = left / right;
-			}
-		}
-
-		return true;	
-	}
-	
-	//expr2 : ['-'] expr3;
-	private boolean expr2()
-	{
-		CLexer.TokenTypeEnum currToken;
-		double dblValue;
-		currToken = CLexer.TokenTypeEnum.T_EOL;
-
+		boolean bUMinus = false;
+		
 		if ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_UMINUS )
 		{
-			currToken = m_Lexer.m_currToken.Type;
+			bUMinus = true;
 			m_Lexer.GetNextToken();
 		}
-
-		if ( !expr3() )
+			
+		if ( !expon() )
 			return false;
-
-		if ( currToken == CLexer.TokenTypeEnum.T_UMINUS )
-		{
-			dblValue = m_stack[m_top--];
-			dblValue *= -1;
-			m_stack[++m_top] = dblValue;
-		}
-
-		return true;	
+			
+		if ( bUMinus )
+			m_stack[m_top] *= -1;
+			
+		return true;
+	}	
+	
+	//<expon>  = <factp> <exponp>
+	private boolean expon()
+	{
+		if ( !factp() )
+			return false;
+			
+		if ( !exponp() )
+			return false;
+		
+		return true;
 	}
 	
-	//expr3 : expr4 {'^' expr4}
-	private boolean expr3()
+	//<exponp> = ^ <factp> <exponp> | epsilon
+	private boolean exponp()
 	{
 		double right, left;
-		int count = 0;
-		//CLexer.TokenTypeEnum currToken;
-
-		if ( !expr4() )
-			return false;
-
-		while ( m_Lexer.m_currToken.Type == CLexer.TokenTypeEnum.T_EXP )
-		{
-			count++;
-			//currToken = m_Lexer.m_currToken.Type;
-			m_Lexer.GetNextToken();
-
-			if ( !expr4() )
-				return false;
-		}
 		
-		while ( count > 0 )
-		{
-			right = m_stack[m_top--];
-			left  = m_stack[m_top--];
-
-			m_stack[++m_top] = Math.pow(left, right);
+		// FOLLOW(exponp) = { / * - + ) $ }
 			
-			count--;
+		switch ( m_Lexer.m_currToken.Type )
+		{
+			case T_EXP:	
+				m_Lexer.GetNextToken();
+				if ( !factp() )
+					return false;
+				//right = m_stack[m_top--];
+				//left  = m_stack[m_top--];
+				//m_stack[++m_top] = Math.pow(left, right);
+				if ( !exponp() )
+					return false;
+				// va messo qui perché l'operatore ^ è associativo a destra.
+				right = m_stack[m_top--];
+				left  = m_stack[m_top--];
+				m_stack[++m_top] = Math.pow(left, right);					
+				break;
+			case T_PLUS:   // epsilon
+				break;
+			case T_MINUS:  // epsilon
+				break;				
+			case T_MULT:   // epsilon
+				break;
+			case T_DIV:    // epsilon				
+				break;			
+			case T_CPAREN: // epsilon
+				break;			
+			case T_EOL:    // epsilon			
+				break;
+			default:
+				System.out.println("Errore di sintassi.");
+				return false;							
 		}
-
-		return true;	
-	}
 		
-	//expr4 : T_NUMBER
-	//		| '(' expr ')'
-	private boolean expr4()
-	{	
+		return true;		
+	}	
+	
+	//<factp>  = ( <expr> ) | NUM 
+	private boolean factp()
+	{
 		switch( m_Lexer.m_currToken.Type )
 		{
-		case T_NUMBER:
-			m_stack[++m_top] = m_Lexer.m_currToken.Value;
-			m_Lexer.GetNextToken();
-			break;
 		case T_OPAREN:
 			m_Lexer.GetNextToken();
 			if ( !expr() )
 				return false;
 			if ( !match(CLexer.TokenTypeEnum.T_CPAREN) )
 			{
-				//System.out.println("Errore: parentesi non bilanciate.");				
-				System.out.println("Error: unmatched parentheses.");								
+				System.out.println("Errore: parentesi non bilanciate.");
 				return false;
 			}
 			break;
+		case T_NUMBER:
+			m_stack[++m_top] = m_Lexer.m_currToken.Value;
+			m_Lexer.GetNextToken();
+			break;			
 		default:
-			//System.out.println("Errore: atteso numero, meno unario o parentesi aperta.");							
-			//System.out.print("Trovato invece ");										
-			System.out.println("Error: expected number, unary minus or opening parenthesis.");							
-			System.out.print("Found instead ");													
-			System.out.println(m_Lexer.m_currToken.str);
+			System.out.println("Errore: atteso numero o parentesi aperta.");
 			return false;
 		}
 
-		return true;	
+		return true;					
 	}
-
+		
 	private boolean match(CLexer.TokenTypeEnum ExpectedToken)
 	{
 		if ( m_Lexer.m_currToken.Type == ExpectedToken )
@@ -248,4 +340,3 @@ public class CParser
 	private double[] m_stack;
 	private double m_value;
 }
-
