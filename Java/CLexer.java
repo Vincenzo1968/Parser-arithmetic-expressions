@@ -99,7 +99,7 @@ public class CLexer
 				}
 				if ( m_nNextPos < str.length() && str.charAt(m_nNextPos) == '.' )				
 				{
-					str.setCharAt(m_nNextPos, '.');
+					strToken.append(str.charAt(m_nNextPos));					
 					m_nNextPos++;					
 					while ( m_nNextPos < str.length() && isdigit(str.charAt(m_nNextPos)) )
 					{
