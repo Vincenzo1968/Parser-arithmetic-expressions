@@ -30,6 +30,15 @@ using System.IO;
 
 using ExprCS;
 
+/*
+expr  : expr1 {('+' | '-') expr1};
+expr1 : expr2 {('*' | '/') expr2};
+expr2 : ['-'] expr3;
+expr3 : expr4 {'^' expr4}
+expr4 : T_NUMBER
+		| '(' expr ')'
+*/
+
 namespace ExprCS
 {
     public class CParser
@@ -71,6 +80,7 @@ namespace ExprCS
             return m_value;
         }
 
+		// expr  : expr1 {('+' | '-') expr1};
         private bool expr()
         {
             double right, left;
@@ -100,6 +110,7 @@ namespace ExprCS
             return true;
         }
 
+		// expr1 : expr2 {('*' | '/') expr2};
         private bool expr1()
         {
             double right, left;
@@ -135,7 +146,8 @@ namespace ExprCS
 
             return true;
         }
-                
+
+		// expr2 : ['-'] expr3;
         private bool expr2()
         {
             TokenType currToken;
@@ -162,6 +174,7 @@ namespace ExprCS
             return true;
         }
         
+		// expr3 : expr4 {'^' expr4}
         private bool expr3()
         {
             double right, left;
@@ -194,6 +207,7 @@ namespace ExprCS
             return true;
         }
         
+		// expr4 : T_NUMBER | '(' expr ')'        
         private bool expr4()
         {
             switch (m_Lexer.m_currToken.Type)

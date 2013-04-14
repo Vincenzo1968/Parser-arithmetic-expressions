@@ -23,8 +23,9 @@
 #include <string>
 using namespace std;
 
+//#include "lexer.h"
 #include "parser.h"
-#include "lexer.h"
+//#include "parser_bnf.h"
 
 int main()
 {

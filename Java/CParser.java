@@ -222,7 +222,7 @@ public class CParser
 		default:
 			//System.out.println("Errore: atteso numero, meno unario o parentesi aperta.");							
 			//System.out.print("Trovato invece ");										
-			System.out.println("Error: expected number, unary minus or opening parenthesis.");							
+			System.out.println("Error: expected number, unary minus or opening parenthesis.");
 			System.out.print("Found instead ");													
 			System.out.println(m_Lexer.m_currToken.str);
 			return false;

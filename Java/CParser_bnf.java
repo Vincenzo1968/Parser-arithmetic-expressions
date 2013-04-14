@@ -24,7 +24,6 @@ import java.lang.String;
 import java.lang.StringBuilder;
 
 /*
-<start>  = <expr>
 <expr>   = <term> <exprp>
 <exprp>  = + <term> <exprp> | - <term> <exprp> | epsilon
 <term>   = <fact> <termp>
@@ -42,7 +41,6 @@ termp
 exponp
 
 First Set:
-FIRST(start)  = { - NUM ( }
 FIRST(expr)   = { - NUM ( }
 FIRST(exprp)  = { - + empty }
 FIRST(term)   = { - NUM ( }
@@ -53,7 +51,6 @@ FIRST(exponp) = { ^ empty }
 FIRST(factp)  = { NUM ( }
 
 Follow Set:
-FOLLOW(start)  = { $ }
 FOLLOW(expr)   = { ) $ }
 FOLLOW(exprp)  = { ) $ }
 FOLLOW(term)   = { - + ) $ }
@@ -88,7 +85,7 @@ public class CParser
 
 		while ( ret && m_Lexer.m_currToken.Type != CLexer.TokenTypeEnum.T_EOL )
 		{
-			ret = start();
+			ret = expr();
 		}
 
 		if ( m_top >= 0 )
@@ -103,13 +100,6 @@ public class CParser
 		return m_value;
 	}
 	
-
-	//<start> = <expr>
-	private boolean start()
-	{
-		return expr();
-	}
-
 	//<expr> = <term> <exprp>	
 	private boolean expr()
 	{
@@ -154,7 +144,8 @@ public class CParser
 			case T_EOL:    // epsilon						
 				break;
 			default:
-				System.out.println("Errore di sintassi.");
+				//System.out.println("Errore di sintassi.");
+				System.out.println("Syntax error.");
 				return false;			
 		}
 		
@@ -197,7 +188,8 @@ public class CParser
 				right = m_stack[m_top--];
 				if ( right == 0 )
 				{
-					System.out.println("Errore: divisione per zero.");
+					//System.out.println("Errore: divisione per zero.");
+					System.out.println("Error: division by zero.");										
 					return false;					
 				}
 				left  = m_stack[m_top--];
@@ -214,7 +206,8 @@ public class CParser
 			case T_EOL:    // epsilon			
 				break;
 			default:
-				System.out.println("Errore di sintassi.");
+				//System.out.println("Errore di sintassi.");
+				System.out.println("Syntax error.");
 				return false;							
 		}
 		
@@ -272,6 +265,7 @@ public class CParser
 				if ( !exponp() )
 					return false;
 				// va messo qui perché l'operatore ^ è associativo a destra.
+				// placed here because the ^ operator is right associative.
 				right = m_stack[m_top--];
 				left  = m_stack[m_top--];
 				m_stack[++m_top] = Math.pow(left, right);					
@@ -289,8 +283,9 @@ public class CParser
 			case T_EOL:    // epsilon			
 				break;
 			default:
-				System.out.println("Errore di sintassi.");
-				return false;							
+				//System.out.println("Errore di sintassi.");
+				System.out.println("Syntax error.");
+				return false;
 		}
 		
 		return true;		
@@ -307,7 +302,8 @@ public class CParser
 				return false;
 			if ( !match(CLexer.TokenTypeEnum.T_CPAREN) )
 			{
-				System.out.println("Errore: parentesi non bilanciate.");
+				//System.out.println("Errore: parentesi non bilanciate.");
+				System.out.println("Error: unmatched parentheses.");												
 				return false;
 			}
 			break;
@@ -316,7 +312,8 @@ public class CParser
 			m_Lexer.GetNextToken();
 			break;			
 		default:
-			System.out.println("Errore: atteso numero o parentesi aperta.");
+			//System.out.println("Errore: atteso numero o parentesi aperta.");
+			System.out.println("Error: expected number or opening parenthesis.");
 			return false;
 		}
 
