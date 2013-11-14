@@ -50,4 +50,4 @@ int expon(ParserData *pd);
 int exponp(ParserData *pd);
 int factp(ParserData *pd);
 
-#endif // PARSER_H
+#endif /* PARSER_H */

@@ -22,9 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#include "lexer.h"
+/* #include "lexer.h" */
 #include "parser.h"
-//#include "parser_bnf.h"
+/* #include "parser_bnf.h" */
 
 int main()
 {

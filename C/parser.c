@@ -25,7 +25,7 @@
 #include <string.h>
 #include <math.h>
 
-// gcc -Wall -W -O3 -std=c99 ParseExpr.c parser.c lexer.c -lm -o expr
+/* gcc -Wall -W -O3 -std=c99 ParseExpr.c parser.c lexer.c -lm -o expr */
 
 #include "parser.h"
 
@@ -77,7 +77,7 @@ int match(TokenTypeEnum ExpectedToken, ParserData *pd)
 	return 0;
 }
 
-//expr  : expr1 {('+' | '-') expr1};
+/* expr  : expr1 {('+' | '-') expr1}; */
 int expr(ParserData *pd)
 {
 	double right, left;
@@ -89,7 +89,6 @@ int expr(ParserData *pd)
 	while ( pd->m_Token.Type == T_PLUS || pd->m_Token.Type == T_MINUS )
 	{
 		currToken = pd->m_Token.Type;
-		//GetNextToken();
 		GetNextToken(pd->m_strExpr, &(pd->m_Token));
 
 		if ( !expr1(pd) )
@@ -111,7 +110,7 @@ int expr(ParserData *pd)
 	return 1;
 }
 
-//expr1 : expr2 {('*' | '/') expr2};
+/* expr1 : expr2 {('*' | '/') expr2}; */
 int expr1(ParserData *pd)
 {
 	double right, left;
@@ -149,7 +148,7 @@ int expr1(ParserData *pd)
 	return 1;
 }
 
-//expr2 : ['-'] expr3;
+/* expr2 : ['-'] expr3; */
 int expr2(ParserData *pd)
 {
 	int currToken;
@@ -174,11 +173,10 @@ int expr2(ParserData *pd)
 	return 1;
 }
 
-//expr3 : expr4 {'^' expr4}
+/* expr3 : expr4 {'^' expr4} */
 int expr3(ParserData *pd)
 {
 	double right, left;
-	//int currToken;
 	int count = 0;
 
 	if ( !expr4(pd) )
@@ -188,7 +186,6 @@ int expr3(ParserData *pd)
 	{
 		count++;
 		
-		//currToken = pd->m_Token.Type;
 		GetNextToken(pd->m_strExpr, &(pd->m_Token));
 
 		if ( !expr4(pd) )
@@ -208,7 +205,7 @@ int expr3(ParserData *pd)
 	return 1;
 }
 
-//expr4 : T_NUMBER | '(' expr ')'
+/* expr4 : T_NUMBER | '(' expr ')' */
 int expr4(ParserData *pd)
 {
 	switch( pd->m_Token.Type )

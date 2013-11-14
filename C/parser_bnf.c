@@ -25,7 +25,7 @@
 #include <string.h>
 #include <math.h>
 
-// gcc -Wall -W -O3 -std=c99 ParseExpr.c parser_bnf.c lexer.c -lm -o expr
+/* gcc -Wall -W -O3 -std=c99 ParseExpr.c parser_bnf.c lexer.c -lm -o expr */
 
 #include "parser_bnf.h"
 
@@ -107,7 +107,7 @@ int match(TokenTypeEnum ExpectedToken, ParserData *pd)
 }
 
 
-//<expr> = <term> <exprp>	
+/* <expr> = <term> <exprp> */	
 int expr(ParserData *pd)
 {
 	if ( !term(pd) )
@@ -119,7 +119,7 @@ int expr(ParserData *pd)
 	return 1;
 }
 
-//<exprp> = + <term> <exprp> | - <term> <exprp> | epsilon
+/* <exprp> = + <term> <exprp> | - <term> <exprp> | epsilon */
 int exprp(ParserData *pd)
 {
 	double right, left;
@@ -146,12 +146,12 @@ int exprp(ParserData *pd)
 			if ( !exprp(pd) )
 				return 0;			
 			break;
-		case T_CPAREN: // epsilon
+		case T_CPAREN: /* epsilon */
 			break;
-		case T_EOL:    // epsilon						
+		case T_EOL:    /* epsilon */
 			break;
 		default:
-			//printf("Errore di sintassi.\n");			
+			/* printf("Errore di sintassi.\n"); */
 			printf("Syntax error.\n");
 			return 0;			
 	}
@@ -159,7 +159,7 @@ int exprp(ParserData *pd)
 	return 1;
 }	
 
-//<term> = <fact> <termp>
+/* <term> = <fact> <termp> */
 int term(ParserData *pd)
 {
 	if ( !fact(pd) )
@@ -171,7 +171,7 @@ int term(ParserData *pd)
 	return 1;
 }
 
-//<termp> = * <fact> <termp> | / <fact> <termp> | epsilon
+/* <termp> = * <fact> <termp> | / <fact> <termp> | epsilon */
 int termp(ParserData *pd)
 {
 	double right, left;
@@ -195,7 +195,7 @@ int termp(ParserData *pd)
 			right = pd->m_stack[pd->m_top--];
 			if ( right == 0 )
 			{
-				// printf("Errore: divisione per zero.\n");
+				/* printf("Errore: divisione per zero.\n"); */
 				printf("Error: division by zero.\n");
 				return 0;
 			}
@@ -204,16 +204,16 @@ int termp(ParserData *pd)
 			if ( !termp(pd) )
 				return 0;			
 			break;
-		case T_PLUS:   // epsilon
+		case T_PLUS:   /* epsilon */
 			break;
-		case T_MINUS:  // epsilon				
+		case T_MINUS:  /* epsilon */			
 			break;			
-		case T_CPAREN: // epsilon
+		case T_CPAREN: /* epsilon */
 			break;			
-		case T_EOL:    // epsilon			
+		case T_EOL:    /* epsilon */		
 			break;
 		default:
-			// printf("Errore di sintassi.\n");
+			/* printf("Errore di sintassi.\n"); */
 			printf("Syntax error.\n");
 			return 0;
 	}
@@ -221,7 +221,7 @@ int termp(ParserData *pd)
 	return 1;
 }
 
-//<fact>   = - <expon> | <expon>
+/* <fact>   = - <expon> | <expon> */
 int fact(ParserData *pd)
 {
 	int bUMinus = 0;
@@ -241,7 +241,7 @@ int fact(ParserData *pd)
 	return 1;
 }	
 
-//<expon>  = <factp> <exponp>
+/* <expon>  = <factp> <exponp> */
 int expon(ParserData *pd)
 {
 	if ( !factp(pd) )
@@ -253,12 +253,12 @@ int expon(ParserData *pd)
 	return 1;
 }
 
-//<exponp> = ^ <factp> <exponp> | epsilon
+/* <exponp> = ^ <factp> <exponp> | epsilon */
 int exponp(ParserData *pd)
 {
 	double right, left;
 		
-	// FOLLOW(exponp) = { / * - + ) $ }
+	/* FOLLOW(exponp) = { / * - + ) $ } */
 			
 	switch ( pd->m_Token.Type )
 	{
@@ -266,31 +266,35 @@ int exponp(ParserData *pd)
 			GetNextToken(pd->m_strExpr, &(pd->m_Token));
 			if ( !factp(pd) )
 				return 0;
-			//right = pd->m_stack[pd->m_top--];
-			//left  = pd->m_stack[pd->m_top--];
-			//pd->m_stack[++pd->m_top] = pow(left, right);
+			/*
+			right = pd->m_stack[pd->m_top--];
+			left  = pd->m_stack[pd->m_top--];
+			pd->m_stack[++pd->m_top] = pow(left, right);
+			*/
 			if ( !exponp(pd) )
 				return 0;
-			// va messo qui perché l'operatore ^ è associativo a destra.
-			// placed here because the ^ operator is right associative.
+			/*
+			va messo qui perché l'operatore ^ è associativo a destra.
+			placed here because the ^ operator is right associative.
+			*/
 			right = pd->m_stack[pd->m_top--];
 			left  = pd->m_stack[pd->m_top--];
 			pd->m_stack[++pd->m_top] = pow(left, right);
 			break;
-		case T_PLUS:   // epsilon
+		case T_PLUS:   /* epsilon */
 			break;
-		case T_MINUS:  // epsilon
+		case T_MINUS:  /* epsilon */
 			break;				
-		case T_MULT:   // epsilon
+		case T_MULT:   /* epsilon */
 			break;
-		case T_DIV:    // epsilon				
+		case T_DIV:    /* epsilon */			
 			break;			
-		case T_CPAREN: // epsilon
+		case T_CPAREN: /* epsilon */
 			break;			
-		case T_EOL:    // epsilon			
+		case T_EOL:    /* epsilon */		
 			break;
 		default:
-			// printf("Errore di sintassi.\n");
+			/* printf("Errore di sintassi.\n"); */
 			printf("Syntax error.\n");
 			return 0;
 	}
@@ -298,7 +302,7 @@ int exponp(ParserData *pd)
 	return 1;
 }	
 
-//<factp>  = ( <expr> ) | NUM 
+/* <factp>  = ( <expr> ) | NUM */
 int factp(ParserData *pd)
 {
 	switch( pd->m_Token.Type )
@@ -309,7 +313,7 @@ int factp(ParserData *pd)
 			return 0;
 		if ( !match(T_CPAREN, pd) )
 		{
-			//printf("Errore: parentesi non bilanciate.\n");
+			/* printf("Errore: parentesi non bilanciate.\n"); */
 			printf("Error: unmatched parentheses.\n");
 			return 0;
 		}
@@ -319,7 +323,7 @@ int factp(ParserData *pd)
 		GetNextToken(pd->m_strExpr, &(pd->m_Token));
 		break;			
 	default:
-		// printf("Errore: atteso numero o parentesi aperta.\n");;
+		/* printf("Errore: atteso numero o parentesi aperta.\n"); */
 		printf("Error: expected number or opening parenthesis.\n");
 		return 0;
 	}
